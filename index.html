@@ -2,10 +2,107 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Voleky</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Voleky - Pi Mainnet App</title>
+
+  <script src="https://sdk.minepi.com/pi-sdk.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 50px 20px;
+      background: #ffffff;
+    }
+
+    h1 {
+      font-size: 42px;
+      margin-bottom: 10px;
+    }
+
+    p {
+      font-size: 20px;
+    }
+
+    button {
+      margin-top: 30px;
+      padding: 15px 30px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      background: #6f3fa1;
+      color: white;
+    }
+  </style>
 </head>
+
 <body>
+
   <h1>Voleky</h1>
   <p>Pi Mainnet App</p>
+
+  <button id="payButton">Test Payment</button>
+
+  <p id="status"></p>
+
+  <script>
+    const status = document.getElementById("status");
+    const payButton = document.getElementById("payButton");
+
+    Pi.init({
+      version: "2.0",
+      sandbox: false
+    });
+
+    payButton.addEventListener("click", function () {
+
+      status.innerText = "Starting Pi payment...";
+
+      Pi.authenticate(
+        ["username", "payments"],
+        function (payment) {
+          console.log("Incomplete payment:", payment);
+        }
+      ).then(function () {
+
+        Pi.createPayment({
+          amount: 0.01,
+          memo: "Voleky test payment",
+          metadata: {
+            app: "Voleky",
+            purpose: "Step 10 test transaction"
+          }
+        }, {
+
+          onReadyForServerApproval: function (paymentId) {
+            console.log("Payment ready for server approval:", paymentId);
+            status.innerText = "Waiting for server approval...";
+          },
+
+          onReadyForServerCompletion: function (paymentId, txid) {
+            console.log("Payment ready for completion:", paymentId, txid);
+            status.innerText = "Transaction submitted.";
+          },
+
+          onCancel: function (paymentId) {
+            console.log("Payment cancelled:", paymentId);
+            status.innerText = "Payment cancelled.";
+          },
+
+          onError: function (error, payment) {
+            console.log("Payment error:", error, payment);
+            status.innerText = "Payment error.";
+          }
+
+        });
+
+      }).catch(function (error) {
+        console.error(error);
+        status.innerText = "Pi authentication failed.";
+      });
+
+    });
+  </script>
+
 </body>
 </html>
