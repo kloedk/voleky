@@ -61,8 +61,41 @@
       Pi.authenticate(
         ["username", "payments"],
         function (payment) {
-          console.log("Incomplete payment:", payment);
-        }
+    console.log("Incomplete payment:", payment);
+
+    if (
+        payment &&
+        payment.identifier &&
+        payment.transaction &&
+        payment.transaction.txid
+    ) {
+        status.innerText = "Completing incomplete payment...";
+
+        fetch("/.netlify/functions/complete", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                paymentId: payment.identifier,
+                txid: payment.transaction.txid
+            })
+        })
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
+            console.log("Incomplete payment completion response:", data);
+            status.innerText = "Incomplete payment completed.";
+        })
+        .catch(function (error) {
+            console.error("Incomplete payment completion error:", error);
+            status.innerText = "Incomplete payment completion failed.";
+        });
+    } else {
+        console.log("Incomplete payment has no txid yet:", payment);
+    }
+}
       ).then(function () {
 
         Pi.createPayment({
