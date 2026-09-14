@@ -74,15 +74,68 @@
           }
         }, {
 
-          onReadyForServerApproval: function (paymentId) {
-            console.log("Payment ready for server approval:", paymentId);
-            status.innerText = "Waiting for server approval...";
-          },
+  onReadyForServerApproval: function (paymentId) {
+  console.log("Payment ready for server approval:", paymentId);
+  status.innerText = "Approving payment...";
 
-          onReadyForServerCompletion: function (paymentId, txid) {
-            console.log("Payment ready for completion:", paymentId, txid);
-            status.innerText = "Transaction submitted.";
-          },
+  fetch("/.netlify/functions/approve", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      paymentId: paymentId
+    })
+  })
+    .then(function (response) {
+      return response.json();
+    })
+    .then(function (data) {
+      console.log("Server approval response:", data);
+    })
+    .catch(function (error) {
+      console.error("Approval error:", error);
+      status.innerText = "Payment approval failed.";
+    });
+},
+
+onReadyForServerCompletion: function (paymentId, txid) {
+    console.log("Payment ready for completion:", paymentId, txid);
+    status.innerText = "Completing payment...";
+
+    fetch("/.netlify/functions/complete", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            paymentId: paymentId,
+            txid: txid
+        })
+    })
+    .then(function (response) {
+        return response.json();
+    })
+    .then(function (data) {
+        console.log("Server completion response:", data);
+        status.innerText = "Payment completed successfully.";
+    })
+    .catch(function (error) {
+        console.error("Completion error:", error);
+        status.innerText = "Payment completion failed.";
+    });
+},
+
+onCancel: function (paymentId) {
+  console.log("Payment cancelled:", paymentId);
+  status.innerText = "Payment cancelled.";
+}, 
+  onError: function (error, payment) {
+    console.log("Payment error:", error, payment);
+    status.innerText = "Payment error.";
+  }
+
+});
 
           onCancel: function (paymentId) {
             console.log("Payment cancelled:", paymentId);
