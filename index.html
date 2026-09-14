@@ -137,17 +137,7 @@ onCancel: function (paymentId) {
 
 });
 
-          onCancel: function (paymentId) {
-            console.log("Payment cancelled:", paymentId);
-            status.innerText = "Payment cancelled.";
-          },
-
-          onError: function (error, payment) {
-            console.log("Payment error:", error, payment);
-            status.innerText = "Payment error.";
-          }
-
-        });
+          
 
       }).catch(function (error) {
         console.error(error);
