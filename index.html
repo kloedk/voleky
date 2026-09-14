@@ -98,11 +98,13 @@ let incompletePaymentFound = false;
     }
 }
       ).then(function () {
-if (incomplete Payment Found) {
+).then(function () {
 
-return;
+    if (incompletePaymentFound) {
+        return;
+    }
 
-}
+    Pi.createPayment({
         Pi.createPayment({
           amount: 0.01,
           memo: "Voleky test payment",
