@@ -48,12 +48,12 @@
   <script>
     const status = document.getElementById("status");
     const payButton = document.getElementById("payButton");
-
+let incompletePaymentFound = false;    
     Pi.init({
       version: "2.0",
       sandbox: false
     });
-
+let incompletePaymentFound = false;
     payButton.addEventListener("click", function () {
 
       status.innerText = "Starting Pi payment...";
