@@ -61,7 +61,8 @@ let incompletePaymentFound = false;
       Pi.authenticate(
         ["username", "payments"],
         function (payment) {
-    console.log("Incomplete payment:", payment);
+   incompletePaymentFound = true;
+          console.log("Incomplete payment:", payment);
 
     if (
         payment &&
