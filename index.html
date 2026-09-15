@@ -115,32 +115,36 @@ let incompletePaymentFound = false;
         }, {
 
   onReadyForServerApproval: function (paymentId) {
-  console.log("Payment ready for server approval:", paymentId);
-  status.innerText = "Approving payment...";
+    console.log("Payment ready for server approval:", paymentId);
+    status.innerText = "Approving payment...";
 
-  fetch("/.netlify/functions/approve", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      paymentId: paymentId
+    fetch("/.netlify/functions/approve", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            paymentId: paymentId
+        })
     })
-  })
     .then(function (response) {
-      return response.json();
+        if (!response.ok) {
+            throw new Error("Approval failed with status " + response.status);
+        }
+        return response.json();
     })
     .then(function (data) {
-      console.log("Server approval response:", data);
+        console.log("Server approval response:", data);
+        status.innerText = "Payment approved. Waiting for completion...";
     })
     .catch(function (error) {
-      console.error("Approval error:", error);
-      status.innerText = "Payment approval failed.";
+        console.error("Approval error:", error);
+        status.innerText = "Payment approval failed.";
     });
 },
 
 onReadyForServerCompletion: function (paymentId, txid) {
-    console.log("Payment ready for completion:", paymentId, txid);
+    console.log("Payment ready for server completion:", paymentId, txid);
     status.innerText = "Completing payment...";
 
     fetch("/.netlify/functions/complete", {
@@ -154,6 +158,9 @@ onReadyForServerCompletion: function (paymentId, txid) {
         })
     })
     .then(function (response) {
+        if (!response.ok) {
+            throw new Error("Completion failed with status " + response.status);
+        }
         return response.json();
     })
     .then(function (data) {
@@ -167,13 +174,14 @@ onReadyForServerCompletion: function (paymentId, txid) {
 },
 
 onCancel: function (paymentId) {
-  console.log("Payment cancelled:", paymentId);
-  status.innerText = "Payment cancelled.";
-}, 
-  onError: function (error, payment) {
+    console.log("Payment cancelled:", paymentId);
+    status.innerText = "Payment cancelled.";
+},
+
+onError: function (error, payment) {
     console.log("Payment error:", error, payment);
     status.innerText = "Payment error.";
-  }
+}
 
 });
 
