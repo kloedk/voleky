@@ -49,6 +49,7 @@
     const status = document.getElementById("status");
     const payButton = document.getElementById("payButton");
 let incompletePaymentFound = false;    
+ let accessToken = null;
     Pi.init({
       version: "2.0",
       sandbox: false
@@ -97,7 +98,8 @@ let incompletePaymentFound = false;
         console.log("Incomplete payment has no txid yet:", payment);
     }
 }
-      ).then(function () {
+     .then(function (authResult) {
+    accessToken = authResult.accessToken;
 
 
     if (incompletePaymentFound) {
@@ -120,9 +122,10 @@ let incompletePaymentFound = false;
 
     fetch("/.netlify/functions/approve", {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
+       headers: {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer " + accessToken
+}, 
         body: JSON.stringify({
             paymentId: paymentId
         })
