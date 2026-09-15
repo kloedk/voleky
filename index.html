@@ -50,10 +50,21 @@
     const payButton = document.getElementById("payButton");
 let incompletePaymentFound = false;    
  let accessToken = null;
+try {
+    if (typeof Pi === "undefined") {
+        throw new Error("Pi SDK is not loaded.");
+    }
+
     Pi.init({
-      version: "2.0",
-      sandbox: false
+        version: "2.0",
+        sandbox: false
     });
+
+    status.innerText = "Pi SDK initialized.";
+} catch (error) {
+    console.error("Pi init error:", error);
+    status.innerText = "Pi SDK error: " + error.message;
+}    
 
     payButton.addEventListener("click", function () {
 
